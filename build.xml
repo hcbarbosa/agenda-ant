@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ciclo de vida -->
+<!-- resolver dependencias, limpar projeto, compilar, copiar recursos, compilar testes, -->
+<!-- executar testes, empacotar, deploy local, executar testes de integracao, gerar doc, -->
+<!-- gerar estatisticas, deploy remoto, publicar site -->
+<project name="agenda" default="compilar">
+	<!-- propriedades criadas para evitar repeticao no codigo e deixar a manutencao facil -->
+	<!-- <loadproperties srcFile="build.properties"/> -->
+	<property file="build.properties" />
+
+	<!-- limpar projeto -->
+	<target name="limpar">
+		<delete dir="${build.dir}" />
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.dir}/${classes.dir}" />
+		<mkdir dir="${build.dir}/${classes.teste.dir}" />
+		<mkdir dir="${build.dir}/relatorio-teste" />/
+	</target>
+
+	<!-- classpaths refatorados -->
+	<path id="classpath-compilacao">
+		<fileset dir="WebContent/WEB-INF/lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+	<path id="classpath-compilacao-teste">
+		<path refid="classpath-compilacao" />
+		<pathelement path="${build.dir}/${classes.dir}" />
+		<fileset dir="lib-teste">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+	<path id="classpath-execucao-teste">
+		<path refid="classpath-compilacao-teste" />
+		<pathelement path="${build.dir}/${classes.teste.dir}" />
+	</path>
+
+	<!-- copiar recursos -->
+	<target name="copiar-recursos" depends="limpar">
+		<!-- estava faltando o log4.xml -->
+		<copy todir="${build.dir}/${classes.dir}">
+			<fileset dir="src">
+				<include name="*.xml"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- compilar -->
+	<target name="compilar" depends="copiar-recursos">
+		<!-- diretorio bin pertence ao eclipse <javac srcdir="src" destdir="bin"> -->
+		<javac srcdir="src" destdir="${build.dir}/${classes.dir}">
+			<classpath refid="classpath-compilacao" />
+		</javac>
+	</target>
+
+	<!-- compilar testes -->
+	<target name="compilar-teste" depends="compilar">
+		<javac srcdir="src-teste" destdir="${build.dir}/${classes.teste.dir}">
+			<classpath refid="classpath-compilacao-teste" />
+		</javac>
+	</target>
+
+	<!-- executar testes -->
+	<target name="executar-teste" depends="compilar-teste">
+		<!-- habilita saida da execucao de testes -->
+		<!-- mostrar um relatório no final (printsummary) e configurar a saida no console (showoutput) -->
+		<junit haltonfailure="yes" showoutput="true" printsummary="true">
+			<!-- formato da saida da execucao de testes (xml, plain, brief e failure)-->
+			<formatter type="plain" />
+			<batchtest todir="${build.dir}/relatorio-teste">
+				<fileset dir="src-teste">
+					<include name="**/*Test.java" />
+				</fileset>
+			</batchtest>
+			<classpath refid="classpath-execucao-teste" />
+		</junit>
+	</target>
+
+	<!-- empacotar -->
+	<target name="empacotar" depends="executar-teste">
+		<!-- cria jar <jar destfile="agenda-ant.jar" basedir="${build.dir}"/> -->
+		<war destfile="${build.dir}/agenda-ant.war" webxml="WebContent/WEB-INF/web.xml">
+			<classes dir="${build.dir}/${classes.dir}"/>
+			<fileset dir="WebContent">
+				<exclude name="WEB-INF/classes/"/>
+			</fileset>
+		</war>
+	</target>
+
+	<!-- deploy local -->
+	<target name="deploy-local" depends="empacotar">
+		<copy file="${build.dir}/agenda-ant.war" todir="C:\Users\hbarbosa\Downloads\Minhas coisas\apache-tomcat-9.0.0.M17\apache-tomcat-9.0.0.M17\webapps"/>
+	</target>
+
+	<!-- rodar tomcat -->
+	<target name="rodar-tomcat-local" depends="deploy-local">
+		<exec executable="C:\Users\hbarbosa\Downloads\Minhas coisas\apache-tomcat-9.0.0.M17\apache-tomcat-9.0.0.M17\bin\startup.bat"></exec>
+	</target>
+	
+	<!-- deploy remoto -->
+	<target name="deploy-remoto" depends="empacotar">
+	<scp todir="hbarbosa@localhost:/pastaDeployAnt" file="${build.dir}/agenda-ant.war" 
+		password="" trust="true"/>		
+</target>
+</project>
