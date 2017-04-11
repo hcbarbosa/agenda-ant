@@ -3,19 +3,10 @@
 <!-- resolver dependencias, limpar projeto, compilar, copiar recursos, compilar testes, -->
 <!-- executar testes, empacotar, deploy local, executar testes de integracao, gerar doc, -->
 <!-- gerar estatisticas, deploy remoto, publicar site -->
-<project name="agenda" default="compilar">
+<project name="agenda" default="compilar" xmlns:ivy="antlib:org.apache.ivy.ant">
 	<!-- propriedades criadas para evitar repeticao no codigo e deixar a manutencao facil -->
 	<!-- <loadproperties srcFile="build.properties"/> -->
 	<property file="build.properties" />
-
-	<!-- limpar projeto -->
-	<target name="limpar">
-		<delete dir="${build.dir}" />
-		<mkdir dir="${build.dir}" />
-		<mkdir dir="${build.dir}/${classes.dir}" />
-		<mkdir dir="${build.dir}/${classes.teste.dir}" />
-		<mkdir dir="${build.dir}/relatorio-teste" />/
-	</target>
 
 	<!-- classpaths refatorados -->
 	<path id="classpath-compilacao">
@@ -34,6 +25,20 @@
 		<path refid="classpath-compilacao-teste" />
 		<pathelement path="${build.dir}/${classes.teste.dir}" />
 	</path>
+	<path id="ivy.lib.path">
+	    <fileset dir="ivy-lib" includes="*.jar"/>
+	</path>
+
+	<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+
+	<!-- limpar projeto -->
+	<target name="limpar">
+		<delete dir="${build.dir}" />
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.dir}/${classes.dir}" />
+		<mkdir dir="${build.dir}/${classes.teste.dir}" />
+		<mkdir dir="${build.dir}/relatorio-teste" />
+	</target>
 
 	<!-- copiar recursos -->
 	<target name="copiar-recursos" depends="limpar">
@@ -45,8 +50,13 @@
 		</copy>
 	</target>
 
+	<!-- gerenciar dependencias ivy -->
+	<target name="atualizar-dependencias" description="resolver as dependencias do projeto" depends="copiar-recursos">
+		<ivy:retrieve />
+	</target>
+
 	<!-- compilar -->
-	<target name="compilar" depends="copiar-recursos">
+	<target name="compilar" depends="atualizar-dependencias">
 		<!-- diretorio bin pertence ao eclipse <javac srcdir="src" destdir="bin"> -->
 		<javac srcdir="src" destdir="${build.dir}/${classes.dir}">
 			<classpath refid="classpath-compilacao" />
@@ -94,12 +104,13 @@
 
 	<!-- rodar tomcat -->
 	<target name="rodar-tomcat-local" depends="deploy-local">
-		<exec executable="C:\Users\hbarbosa\Downloads\Minhas coisas\apache-tomcat-9.0.0.M17\apache-tomcat-9.0.0.M17\bin\startup.bat"></exec>
+		<exec executable="C:\Users\hbarbosa\Downloads\Minhas coisas\apache-tomcat-9.0.0.M17\apache-tomcat-9.0.0.M17\bin\startup.bat">
+		</exec>
 	</target>
-	
+
 	<!-- deploy remoto -->
 	<target name="deploy-remoto" depends="empacotar">
-	<scp todir="hbarbosa@localhost:/pastaDeployAnt" file="${build.dir}/agenda-ant.war" 
-		password="" trust="true"/>		
-</target>
+		<scp todir="hbarbosa@localhost:/pastaDeployAnt" file="${build.dir}/agenda-ant.war" 
+		password="" trust="true"/>
+	</target>
 </project>
