@@ -1,0 +1,9 @@
+Testsuite: br.com.hcb.agenda.controller.ContatosControllerTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.377 sec
+------------- Standard Output ---------------
+13:31:01,748 DEBUG [CglibProxifier      ] a proxy for interface br.com.caelum.vraptor.view.LogicResult is created as class br.com.caelum.vraptor.view.LogicResult$$EnhancerByCGLIB$$1fc2eb8b
+13:31:01,773 DEBUG [CglibProxifier      ] a proxy for class br.com.hcb.agenda.controller.ContatosController is created as class br.com.hcb.agenda.controller.ContatosController$$EnhancerByCGLIB$$2af9aa9a
+------------- ---------------- ---------------
+
+Testcase: salvandoContato took 1.343 sec
+Testcase: listarContatos took 0.004 sec

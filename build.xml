@@ -26,10 +26,10 @@
 		<pathelement path="${build.dir}/${classes.teste.dir}" />
 	</path>
 	<path id="ivy.lib.path">
-	    <fileset dir="ivy-lib" includes="*.jar"/>
+		<fileset dir="ivy-lib" includes="*.jar" />
 	</path>
 
-	<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+	<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
 
 	<!-- limpar projeto -->
 	<target name="limpar">
@@ -45,14 +45,17 @@
 		<!-- estava faltando o log4.xml -->
 		<copy todir="${build.dir}/${classes.dir}">
 			<fileset dir="src">
-				<include name="*.xml"/>
+				<include name="*.xml" />
 			</fileset>
 		</copy>
 	</target>
 
 	<!-- gerenciar dependencias ivy -->
 	<target name="atualizar-dependencias" description="resolver as dependencias do projeto" depends="copiar-recursos">
-		<ivy:retrieve />
+		<ivy:retrieve pattern="WebContent/WEB-INF/lib/[artifact]-[revision].[ext]" conf="webapp" />
+		<ivy:report todir="${build.dir}/report-webapp" />
+		<ivy:retrieve pattern="lib-teste/[artifact]-[revision].[ext]" conf="teste" />
+		<ivy:report todir="${build.dir}/report-teste" />
 	</target>
 
 	<!-- compilar -->
@@ -90,16 +93,16 @@
 	<target name="empacotar" depends="executar-teste">
 		<!-- cria jar <jar destfile="agenda-ant.jar" basedir="${build.dir}"/> -->
 		<war destfile="${build.dir}/agenda-ant.war" webxml="WebContent/WEB-INF/web.xml">
-			<classes dir="${build.dir}/${classes.dir}"/>
+			<classes dir="${build.dir}/${classes.dir}" />
 			<fileset dir="WebContent">
-				<exclude name="WEB-INF/classes/"/>
+				<exclude name="WEB-INF/classes/" />
 			</fileset>
 		</war>
 	</target>
 
 	<!-- deploy local -->
 	<target name="deploy-local" depends="empacotar">
-		<copy file="${build.dir}/agenda-ant.war" todir="C:\Users\hbarbosa\Downloads\Minhas coisas\apache-tomcat-9.0.0.M17\apache-tomcat-9.0.0.M17\webapps"/>
+		<copy file="${build.dir}/agenda-ant.war" todir="C:\Users\hbarbosa\Downloads\Minhas coisas\apache-tomcat-9.0.0.M17\apache-tomcat-9.0.0.M17\webapps" />
 	</target>
 
 	<!-- rodar tomcat -->
@@ -110,7 +113,6 @@
 
 	<!-- deploy remoto -->
 	<target name="deploy-remoto" depends="empacotar">
-		<scp todir="hbarbosa@localhost:/pastaDeployAnt" file="${build.dir}/agenda-ant.war" 
-		password="" trust="true"/>
+		<scp todir="hbarbosa@localhost:/pastaDeployAnt" file="${build.dir}/agenda-ant.war" password="" trust="true" />
 	</target>
 </project>

@@ -3,7 +3,8 @@ package br.com.hcb.agenda.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.caelum.vraptor.ioc.Component;
+import org.springframework.stereotype.Component;
+
 import br.com.hcb.agenda.modelo.Contato;
 
 @Component

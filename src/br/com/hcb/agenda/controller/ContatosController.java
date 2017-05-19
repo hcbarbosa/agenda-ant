@@ -2,11 +2,12 @@ package br.com.hcb.agenda.controller;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import br.com.caelum.vraptor.Get;
 import br.com.caelum.vraptor.Path;
 import br.com.caelum.vraptor.Post;
 import br.com.caelum.vraptor.Put;
-import br.com.caelum.vraptor.Resource;
 import br.com.caelum.vraptor.Result;
 import br.com.hcb.agenda.dao.ContatoDao;
 import br.com.hcb.agenda.modelo.Contato;
